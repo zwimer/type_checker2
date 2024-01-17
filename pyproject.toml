@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simple_type_checker"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+license = {text = "GPL"}
+description = "A small extendable python type checker library"
+urls = {Homepage = "https://github.com/zwimer/simple_type_checker"}
+requires-python = ">= 3.10"
+dynamic = ["version"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[tool.setuptools]
+license-files = ["LICENSE"]
+include-package-data = false
+
+[tool.setuptools.packages]
+find = {namespaces = false}
+
+[tool.setuptools.package-data]
+simple_type_check = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = {attr = "simple_type_check.__version__"}
+
+# Tools
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.ruff]
+ignore=["E731"]
+line-length = 120
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = "unspecified-encoding,missing-module-docstring,too-few-public-methods,missing-class-docstring,missing-function-docstring"
+
