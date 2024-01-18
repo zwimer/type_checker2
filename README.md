@@ -14,8 +14,8 @@ As a decorator:
 ```python
 from simple_type_checker import type_check, TypeCheckFailed
 
-@type_checker.returns(int)
-def id_(x):
+@type_check.returns
+def id_(x) -> int:
     return x
 
 _ = id_(1)  # Passes
@@ -24,6 +24,8 @@ try:
 except TypeCheckFailed as e:
     print("Bad input: ", e)
 ```
+
+Decorators for aruments exist as well: `type_check.args`. Both can be done at once with `type_check.decorate`.
 
 ### With custom types
 
@@ -36,7 +38,7 @@ class Foo:
 
 type_check = TypeChecker(Foo)
 
-assert type_checker(Foo(), Foo)
+assert type_check(Foo(), Foo)
 ```
 
 Special type checking logic desired
@@ -53,7 +55,7 @@ class CheckerBar(Checker):
 
 type_check = TypeChecker(advanced=(Bar,))
 
-assert type_checker(Bad(True), Bar)
-assert not type_checker(Bad(False), Bar)
+assert type_check(Bad(True), Bar)
+assert not type_check(Bad(False), Bar)
 ```
 This use case is useful for container types that take arguments, for example.
