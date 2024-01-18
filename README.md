@@ -25,7 +25,8 @@ except TypeCheckFailed as e:
     print("Bad input: ", e)
 ```
 
-Decorators for aruments exist as well: `type_check.args`. Both can be done at once with `type_check.decorate`.
+Decorators for aruments exist as well: `type_check.args`.
+Both can be done at once with `type_check.decorate`.
 
 ### With custom types
 
@@ -59,3 +60,19 @@ assert type_check(Bad(True), Bar)
 assert not type_check(Bad(False), Bar)
 ```
 This use case is useful for container types that take arguments, for example.
+
+### Failures
+
+This will may work with quoted type annotations without adding a custom type Checker.
+For example, the following will fail:
+```python
+from simple_type_checker import type_check
+Bar = list[int | "Bar"]
+
+@type_check.returns
+def f() -> Bar:
+    return []
+```
+
+This is because no type checker knows what "MyType" is.
+Fixing this is as easy as adding a custom Checker that accepts "MyType" as a valid type, as demonstrated with `CheckerBar` above.

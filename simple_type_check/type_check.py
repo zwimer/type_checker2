@@ -101,7 +101,6 @@ class TypeChecker:
                     self._check_args(ci, f_args, f_kwargs)
                 ret = func(*f_args, **f_kwargs)
                 if check_return and ci.return_type != Parameter.empty and not self(ret, ci.return_type):
-                    print(ci.return_type)
                     raise TypeCheckFailed(f"{func.__name__}()'s return type: {ci.return_type}, {ret}")
                 return ret
 
