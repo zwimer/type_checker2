@@ -1,4 +1,5 @@
-from typing import ContextManager, Callable, Any
+from typing import ContextManager, Any, Callable as CallableTyping
+from collections.abc import Callable as CallableABC
 import unittest
 
 from simple_type_check import type_check
@@ -47,18 +48,19 @@ class TestComplex(unittest.TestCase):
             pass
 
     def test_callable(self):
-        self.assertTrue(type_check(lambda: 1, Callable))
-        self.assertTrue(type_check(type_check, Callable))
-        self.assertTrue(type_check(self.test_callable, Callable))
-        self.assertFalse(type_check(1, Callable))
-        with self.assertRaises(ValueError):
-            type_check(type_check, Callable[..., int])
-        try:
-            # Some versions of python are not ok with ... being a return value
-            self.assertTrue(type_check(type_check, Callable[..., ...]))
-        except TypeError:
-            pass
-        self.assertTrue(type_check(type_check, Callable[..., Any]))
+        for type_ in (CallableTyping, CallableABC):
+            self.assertTrue(type_check(lambda: 1, type_))
+            self.assertTrue(type_check(type_check, type_))
+            self.assertTrue(type_check(self.test_callable, type_))
+            self.assertFalse(type_check(1, type_))
+            with self.assertRaises(ValueError):
+                type_check(type_check, type_[..., int])
+            try:
+                # Some versions of python are not ok with ... being a return value
+                self.assertTrue(type_check(type_check, type_[..., ...]))
+            except TypeError:
+                pass
+            self.assertTrue(type_check(type_check, type_[..., Any]))
 
 
 if __name__ == "__main__":
