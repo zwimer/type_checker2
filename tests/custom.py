@@ -2,7 +2,7 @@ import unittest
 import typing
 
 from simple_type_check import TypeChecker
-from simple_type_check.checker import Checker
+from simple_type_check.top_level_check import TopLevelCheck
 
 
 class Basic1:
@@ -18,12 +18,12 @@ class Complex1:
         self.valid: bool = b
 
 
-class Complex1Checker(Checker):
+class Complex1Check(TopLevelCheck):
     def __call__(self, obj: typing.Any, type_: typing.Any) -> bool:
         return type_ == Complex1 and isinstance(obj, Complex1) and obj.valid
 
 
-type_check = TypeChecker(Basic1, advanced=(Complex1Checker,))
+type_check = TypeChecker(Basic1, advanced=(Complex1Check,))
 
 
 class TestCustom(unittest.TestCase):

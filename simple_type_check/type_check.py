@@ -2,16 +2,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from inspect import Parameter
 
-from .default import COMPLEX, BASIC
 from .callable_info import CallableInfo
+from .default import COMPLEX, BASIC
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from typing import Any
-    from .checker import Checker
+    from .top_level_check import TopLevelCheck
 
 
-__all__ = ("TypeChecker", "TypeCheckFailed", "type_check")
+__all__ = ("TypeChecker", "TypeCheckFailed")
 
 
 class TypeCheckFailed(TypeError, RuntimeError):
@@ -21,15 +21,15 @@ class TypeCheckFailed(TypeError, RuntimeError):
 
 
 class TypeChecker:
-    def __init__(self, *basic: type, advanced: Sequence[type[Checker]] | None = None, bool_is_int: bool = False):
+    def __init__(self, *basic: type, advanced: Sequence[type[TopLevelCheck]] | None = None, bool_is_int: bool = False):
         """
         Construct a type-checker
         :param basic: Additional basic types to handle, where isinstance is sufficient for type checking
         :param advanced: Additional basic types to handle that are not in basic
         :param bool_is_int: If False, will treat bool and int as unrelated types; else booleans are integers
         """
-        adv: tuple[type[Checker], ...] = COMPLEX + (tuple(advanced) if advanced else ())
-        self._advanced: tuple[Checker, ...] = tuple(K(self) for K in adv)
+        adv: tuple[type[TopLevelCheck], ...] = COMPLEX + (tuple(advanced) if advanced else ())
+        self._advanced: tuple[TopLevelCheck, ...] = tuple(K(self) for K in adv)
         self._basic: tuple[type, ...] = tuple(BASIC | (set(basic) if basic else set()))
         self._bool_is_int: bool = bool_is_int
 
@@ -107,6 +107,3 @@ class TypeChecker:
             return wrapper
 
         return decorator
-
-
-type_check = TypeChecker()
