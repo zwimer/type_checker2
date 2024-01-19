@@ -6,13 +6,13 @@ A small extendable python type checker library
 
 Checking a type:
 ```python
-from simple_type_checker import type_check
+from simple_type_check import type_check
 assert type_check("A string", str)
 ```
 
 As a decorator:
 ```python
-from simple_type_checker import type_check, TypeCheckFailed
+from simple_type_check import type_check, TypeCheckFailed
 
 @type_check.returns
 def id_(x) -> int:
@@ -20,9 +20,9 @@ def id_(x) -> int:
 
 _ = id_(1)  # Passes
 try:
-    id_("string")
+    _ = id_("string")  # Raises
 except TypeCheckFailed as e:
-    print("Bad input: ", e)
+    pass
 ```
 
 Decorators for aruments exist as well: `type_check.args`.
@@ -32,7 +32,7 @@ Both can be done at once with `type_check.decorate`.
 
 Basic types where `isinstance` is sufficient:
 ```python
-from simple_type_checker import TypeChecker
+from simple_type_check import TypeChecker
 
 class Foo:
     pass
@@ -42,37 +42,18 @@ type_check = TypeChecker(Foo)
 assert type_check(Foo(), Foo)
 ```
 
-Special type checking logic desired
+Special type checking logic desired:
 ```python
-from simple_type_checker import TypeChecker, Checker
+from simple_type_check import TopLevelCheck, TypeChecker
 
-class Bar:
-    def __init__(self, b):
-        self.can_check = b
+Bar = list[int] | list["Bar"]
 
-class CheckerBar(Checker):
-    def __call__(self, obj: Any, type_: Any) -> bool:
-        return type_ == Bar and isinstance(obj, Bar) and obj.can_check
+class BarCheck(TopLevelCheck):
+    def __call__(self, obj, type_) -> bool:
+        return type_ == "Bar" and self._recurse(obj, Bar)
 
-type_check = TypeChecker(advanced=(Bar,))
+type_check = TypeChecker(advanced=[BarCheck])
 
-assert type_check(Bad(True), Bar)
-assert not type_check(Bad(False), Bar)
+type_check([1, [2], [[3]]], Bar)  # Should pass
 ```
 This use case is useful for container types that take arguments, for example.
-
-### Failures
-
-This will may work with quoted type annotations without adding a custom type Checker.
-For example, the following will fail:
-```python
-from simple_type_checker import type_check
-Bar = list[int | "Bar"]
-
-@type_check.returns
-def f() -> Bar:
-    return []
-```
-
-This is because no type checker knows what "MyType" is.
-Fixing this is as easy as adding a custom Checker that accepts "MyType" as a valid type, as demonstrated with `CheckerBar` above.
