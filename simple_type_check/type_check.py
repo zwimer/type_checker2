@@ -42,7 +42,7 @@ class TypeChecker:
         if obj is None and type_ is None:  # Special case for 'None' since 'None' isn't a type
             return True
         if type_ in self._basic:
-            return isinstance(obj, type_) and (type_ != int or not isinstance(obj, bool) or self._bool_is_int)
+            return isinstance(obj, type_) and (type_ is int or not isinstance(obj, bool) or self._bool_is_int)
         return any(k(obj, type_) for k in self._advanced)
 
     def require(self, obj: Any, type_: Any) -> None:
